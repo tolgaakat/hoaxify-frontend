@@ -20,6 +20,16 @@ class UserSignupPage extends React.Component {
         const errors = { ...this.state.errors }; // kopyalama -spread operator
         errors[name] = undefined
 
+        if (name === 'password' || name === 'passwordRepeat') {
+            if (name === 'password' && value != this.state.passwordRepeat) {
+                errors.passwordRepeat = 'Password mismatch!';
+            } else if (name === 'passwordRepeat' && value != this.state.password) {
+                errors.passwordRepeat = 'Password mismatch!';
+            } else {
+                errors.passwordRepeat = undefined;
+            }
+        }
+
 
         this.setState({
             [name]: value,
@@ -31,6 +41,7 @@ class UserSignupPage extends React.Component {
 
     onClickSignup = async event => {
         event.preventDefault();
+
 
         const { username, displayName, password } = this.state;
 
@@ -46,6 +57,7 @@ class UserSignupPage extends React.Component {
             const response = await signup(body);
         }
         catch (error) {
+            //console.log(error);
             if (error.response.data.validationErrors) {
                 this.setState({ errors: error.response.data.validationErrors });
             }
@@ -69,8 +81,11 @@ class UserSignupPage extends React.Component {
 
 
     render() {
+
+
         const { pendingApiCall, errors } = this.state;
-        const { username, displayName } = errors;
+        const { username, displayName, password, passwordRepeat } = errors;
+
 
         return (
 
@@ -86,19 +101,15 @@ class UserSignupPage extends React.Component {
                     </div> */}
                     <Input name="displayName" label="Display Name" error={displayName}
                         onChange={this.onChange} />
-                    <div className="form-group">
-                        <label>Password</label>
-                        <input className="form-control" name="password" type="password" onChange={this.onChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>Password Repeat</label>
-                        <input className="form-control" name="passwordRepeat" type="password" onChange={this.onChange} />
-                    </div>
+                    <Input name="password" label="Password" error={password}
+                        onChange={this.onChange} type="password" />
+                    <Input name="passwordRepeat" label="Password Repeat" error={passwordRepeat}
+                        onChange={this.onChange} type="password" />
                     <div className="text-center">
                         <button
                             className="btn btn-primary"
                             onClick={this.onClickSignup}
-                            disabled={pendingApiCall}
+                            disabled={pendingApiCall || passwordRepeat != undefined}
                         >
                             {pendingApiCall && <span className="spinner-border spinner-border-sm"> </span>}
                             Sign Up
