@@ -80,11 +80,7 @@ class UserSignupPage extends React.Component {
 
     }
 
-    onChangeLanguage = language => {
-        const { i18n } = this.props;
-        i18n.changeLanguage(language);
-        changeLanguage(language); //axios  accept-language header prm. set eder
-    }
+
 
 
     render() {
@@ -122,10 +118,7 @@ class UserSignupPage extends React.Component {
                             {t('Sign Up')}
                         </button>
                     </div>
-                    <div>
-                        <img src="https://cdn.countryflags.com/thumbs/turkey/flag-square-250.png" width="24" height="24" alt="Turkish Flag" onClick={() => this.onChangeLanguage('tr')} style={{ cursor: 'pointer' }}></img>
-                        <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-square-250.png" width="24" height="24" alt="USA Flag" onClick={() => this.onChangeLanguage('en')} style={{ cursor: 'pointer' }}></img>
-                    </div>
+
                 </form >
             </div >
         );
