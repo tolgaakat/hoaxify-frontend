@@ -2,13 +2,34 @@ import React, { Component } from 'react';
 import Input from '../components/input';
 import { withTranslation } from 'react-i18next'
 import { login } from '../api/apiCalls';
+import axios from 'axios';
+import ButtonWithProgress from '../components/ButtonWithProgress';
 
 class LoginPage extends Component {
 
     state = {
         username: null,
         password: null,
-        error: null
+        error: null,
+        pendingApiCall: false
+    };
+
+    componentDidMount() { // lifecycle: component ekrana konulduğunda tetiklenir
+        axios.interceptors.request.use((request) => {
+            this.setState({ pendingApiCall: true })
+            return request;  // axios'un isteğe devam edebilmesi için
+
+        });
+
+        axios.interceptors.response.use(
+            response => {
+                this.setState({ pendingApiCall: false })
+                return response;
+            },
+            error => {
+                this.setState({ pendingApiCall: false })
+                throw error;
+            })
     }
 
     onChange = event => {
@@ -48,7 +69,7 @@ class LoginPage extends Component {
     render() {
         const { t } = this.props;
 
-        const { username, password, error } = this.state;
+        const { username, password, error, pendingApiCall } = this.state;
 
         const buttonEnabled = username && password;
 
@@ -62,8 +83,12 @@ class LoginPage extends Component {
                         {error}
                     </div>}
                     <div className='text-center'>
-                        <button className='btn btn-primary' onClick={this.onClickLogin}
-                            disabled={!buttonEnabled}>Login</button>
+                        <ButtonWithProgress
+                            onClick={this.onClickLogin}
+                            disabled={!buttonEnabled || pendingApiCall}
+                            pendingApiCall={pendingApiCall}
+                            text={t('Login')}
+                        >Login</ButtonWithProgress>
                     </div>
                 </form>
             </div>
