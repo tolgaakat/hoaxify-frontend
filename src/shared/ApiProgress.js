@@ -1,39 +1,65 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 
-class ApiProgress extends Component {
-
-    state = {
-        pendingApiCall: false
-    }
-
-    componentDidMount() { // lifecycle: component ekrana konulduğunda tetiklenir
-        axios.interceptors.request.use((request) => {
-            this.setState({ pendingApiCall: true })
-            return request;  // axios'un isteğe devam edebilmesi için
-
-        });
-
-        axios.interceptors.response.use(
-            response => {
-                this.setState({ pendingApiCall: false })
-                return response;
-            },
-            error => {
-                this.setState({ pendingApiCall: false })
-                throw error;
-            })
-    }
-
-    render() {
-        const { pendingApiCall } = this.state;
-        return (
-            <div>{React.cloneElement(this.props.children, {
-                pendingApiCall
-            })}</div>
-        )
-    }
+function getDisplayName(WrappedComponent) {
+    return WrappedComponent.displayName || WrappedComponent.name || 'Component';
 }
 
 
-export default ApiProgress;
+export function withApiProgress(WrappedComponent, apiPath) {
+
+    return class extends Component {
+
+        // static displayName = "ApiProgress(" + getDisplayName(WrappedComponent) + ")";
+        static displayName = `ApiProgress(${getDisplayName(WrappedComponent)})`;
+        state = {
+            pendingApiCall: false
+        }
+
+        componentDidMount() { // lifecycle: component ekrana konulduğunda tetiklenir
+
+            this.requestInterceptor = axios.interceptors.request.use((request) => {
+
+                this.updateApiCallFor(request.url, true);
+                return request;  // axios'un isteğe devam edebilmesi için
+
+            });
+
+            this.responseInterceptor = axios.interceptors.response.use(
+                response => {
+                    this.updateApiCallFor(response.config.url, false);
+                    return response;
+                },
+
+                error => {
+                    //console.log("ERR:" + error);
+                    this.updateApiCallFor(error.config.url, false);
+                    throw error;
+                });
+        }
+
+        componentWillUnmount() {
+            axios.interceptors.request.eject(this.requestInterceptor);
+            axios.interceptors.response.eject(this.responseInterceptor);
+        }
+
+        updateApiCallFor = (url, inProgress) => {
+
+            if (url === apiPath) {
+                this.setState({ pendingApiCall: inProgress });
+            }
+        }
+
+        render() {
+            const { pendingApiCall } = this.state;
+            return (
+                /*       <div>{React.cloneElement(this.props.children, {
+                           pendingApiCall
+                       })}</div> */
+                <WrappedComponent pendingApiCall={pendingApiCall}{...this.props} />
+            )
+        }
+    }
+
+}
+

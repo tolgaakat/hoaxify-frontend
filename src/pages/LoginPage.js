@@ -3,6 +3,7 @@ import Input from '../components/input';
 import { withTranslation } from 'react-i18next'
 import { login } from '../api/apiCalls';
 import ButtonWithProgress from '../components/ButtonWithProgress';
+import { withApiProgress } from '../shared/ApiProgress';
 
 class LoginPage extends Component {
 
@@ -31,14 +32,18 @@ class LoginPage extends Component {
             password
         };
 
+        const { push } = this.props.history;
+
         this.setState({
             error: null
         });
 
         try {
             await login(creds);
+            push('/');
         }
         catch (apiError) {
+            console.log(apiError);
             this.setState(
                 {
                     error: apiError.response.data.message
@@ -78,5 +83,7 @@ class LoginPage extends Component {
     }
 }
 
+const LoginPageWithTranslation = withTranslation()(LoginPage);
 
-export default withTranslation()(LoginPage);
+
+export default withApiProgress(LoginPageWithTranslation, '/api/1.0/auth');

@@ -5,6 +5,7 @@ export const signup = (body) => {
 }
 
 export const login = creds => {
+    //console.log(creds)
     return axios.post('/api/1.0/auth', {}, { auth: creds });
 }
 

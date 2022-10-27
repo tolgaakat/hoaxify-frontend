@@ -1,24 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import App from './container/App';
 import reportWebVitals from './reportWebVitals';
-import UserSignupPage from './pages/UserSignupPage';
-import LoginPage from './pages/LoginPage';
 import './i18n';
-import LanguageSelector from './components/LanguageSelector';
-import ApiProgress from './shared/ApiProgress';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <div>
-      <ApiProgress>
-        <UserSignupPage />
-      </ApiProgress>
-
-      <LanguageSelector /></div>
-  </React.StrictMode>
+root.render(<App />
 );
 
 // If you want to start measuring performance in your app, pass a function
