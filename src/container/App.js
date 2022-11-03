@@ -7,16 +7,17 @@ import HomePage from '../pages/HomePage';
 import { HashRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
 import UserPage from '../pages/UserPage';
 import TopBar from '../components/TopBar';
-import { Authentication } from "../shared/AuthenticationContext";
+// import { Authentication } from "../shared/AuthenticationContext";
+import { connect } from 'react-redux';
 
 
 class App extends React.Component {
 
-  static contextType = Authentication;
+  // static contextType = Authentication;
 
 
   render() {
-    const isLoggedIn = this.context.state.isLoggedIn;
+    const { isLoggedIn } = this.props; // destructring
 
     return (
       <div>
@@ -36,5 +37,11 @@ class App extends React.Component {
   }
 }
 
+const mapStateToProps = (store) => {
+  return {
+    isLoggedIn: store.isLoggedIn
+  };
+};
 
-export default App;
+
+export default connect(mapStateToProps)(App);
